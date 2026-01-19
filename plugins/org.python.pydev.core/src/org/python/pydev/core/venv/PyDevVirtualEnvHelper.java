@@ -127,6 +127,7 @@ public class PyDevVirtualEnvHelper {
         try {
             IPath workspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation();
             if (workspaceRoot == null) {
+                Log.log("Workspace root location is null, cannot read PyDev preferences");
                 return null;
             }
 
@@ -142,8 +143,17 @@ public class PyDevVirtualEnvHelper {
             java.io.FileInputStream fis = new java.io.FileInputStream(prefsFile);
             try {
                 byte[] data = new byte[(int) prefsFile.length()];
-                fis.read(data);
-                String content = new String(data, "UTF-8");
+                int offset = 0;
+                int remaining = data.length;
+                while (remaining > 0) {
+                    int read = fis.read(data, offset, remaining);
+                    if (read < 0) {
+                        break;
+                    }
+                    offset += read;
+                    remaining -= read;
+                }
+                String content = new String(data, 0, offset, "UTF-8");
                 
                 // Extract the INTERPRETER_PATH_NEW property which contains the XML
                 String prefix = "INTERPRETER_PATH_NEW=";

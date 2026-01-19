@@ -199,8 +199,17 @@ public class ProjectInterpreterHelper {
         java.io.FileInputStream fis = new java.io.FileInputStream(file);
         try {
             byte[] data = new byte[(int) file.length()];
-            fis.read(data);
-            return new String(data, "UTF-8");
+            int offset = 0;
+            int remaining = data.length;
+            while (remaining > 0) {
+                int read = fis.read(data, offset, remaining);
+                if (read < 0) {
+                    break;
+                }
+                offset += read;
+                remaining -= read;
+            }
+            return new String(data, 0, offset, "UTF-8");
         } finally {
             fis.close();
         }

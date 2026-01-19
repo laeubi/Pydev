@@ -173,8 +173,9 @@ public class WorkspaceInterpreterHelper {
         for (int i = 0; i < parts.length - 1; i++) {  // -1 to skip the executable itself
             String part = parts[i].toLowerCase();
             if (part.equals("venv") || 
-                part.equals("virtualenv") || 
-                part.matches(".*env") && part.length() <= 10 ||  // short env-like names
+                part.equals("virtualenv") ||
+                part.equals("env") ||
+                part.matches("^.{1,7}env$") ||  // short env-like names (e.g., "myenv", "pyenv")
                 part.contains("conda")) {
                 return true;
             }
