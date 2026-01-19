@@ -12,6 +12,7 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.python.pydev.core.log.Log;
 
 /**
  * Unified helper class for working with PyDev virtual environments.
@@ -168,7 +169,7 @@ public class PyDevVirtualEnvHelper {
                 fis.close();
             }
         } catch (Exception e) {
-            System.err.println("Error reading workspace preferences: " + e.getMessage());
+            Log.log("Error reading workspace preferences", e);
             return null;
         }
     }

@@ -13,6 +13,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.python.pydev.core.log.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -63,7 +64,7 @@ public class WorkspaceInterpreterHelper {
             }
         } catch (Exception e) {
             // Log error but don't throw - return what we have
-            System.err.println("Error parsing interpreter preferences: " + e.getMessage());
+            Log.log("Error parsing interpreter preferences", e);
         }
         
         return interpreters;
@@ -110,7 +111,7 @@ public class WorkspaceInterpreterHelper {
 
             return new VirtualEnvironmentInfo(name, executable, pipenvTargetDir, interpreterType);
         } catch (Exception e) {
-            System.err.println("Error parsing interpreter info element: " + e.getMessage());
+            Log.log("Error parsing interpreter info element", e);
             return null;
         }
     }
@@ -146,7 +147,7 @@ public class WorkspaceInterpreterHelper {
     }
 
     /**
-     * Checks if an interpreter is likely a virtual environment based on its path.
+     * Checks if an interpreter is likely a virtual environment based on its path and configuration.
      * 
      * @param info The interpreter information
      * @return true if the interpreter appears to be in a virtual environment
@@ -158,11 +159,28 @@ public class WorkspaceInterpreterHelper {
         
         String path = info.getExecutablePath().toLowerCase();
         
-        // Common virtual environment indicators
-        return path.contains("venv") 
-                || path.contains("virtualenv")
-                || path.contains(".virtualenvs")
-                || path.contains("env")
-                || path.contains("conda");
+        // Check for common virtual environment directory patterns
+        // These are more specific than just containing "env"
+        if (path.contains(".virtualenvs/") || 
+            path.contains("\\.virtualenvs\\") ||
+            path.contains("/virtualenv/") || 
+            path.contains("\\virtualenv\\")) {
+            return true;
+        }
+        
+        // Check for venv or env directories as immediate parents (more specific)
+        String[] parts = path.split("[/\\\\]");
+        for (int i = 0; i < parts.length - 1; i++) {  // -1 to skip the executable itself
+            String part = parts[i].toLowerCase();
+            if (part.equals("venv") || 
+                part.equals("virtualenv") || 
+                part.matches(".*env") && part.length() <= 10 ||  // short env-like names
+                part.contains("conda")) {
+                return true;
+            }
+        }
+        
+        // Not detected as a virtual environment
+        return false;
     }
 }

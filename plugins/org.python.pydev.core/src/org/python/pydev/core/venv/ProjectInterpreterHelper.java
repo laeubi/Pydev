@@ -15,6 +15,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.python.pydev.core.log.Log;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -73,7 +74,7 @@ public class ProjectInterpreterHelper {
             String content = readFileContent(pydevprojectFile);
             return parseInterpreterNameFromXml(content);
         } catch (Exception e) {
-            System.err.println("Error reading .pydevproject file: " + e.getMessage());
+            Log.log("Error reading .pydevproject file", e);
             return null;
         }
     }
@@ -118,7 +119,7 @@ public class ProjectInterpreterHelper {
             String content = readFileContent(pydevprojectFile);
             return parsePropertyFromXml(content, PYTHON_PROJECT_VERSION_KEY);
         } catch (Exception e) {
-            System.err.println("Error reading .pydevproject file: " + e.getMessage());
+            Log.log("Error reading .pydevproject file", e);
             return null;
         }
     }
@@ -170,7 +171,7 @@ public class ProjectInterpreterHelper {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error parsing .pydevproject XML: " + e.getMessage());
+            Log.log("Error parsing .pydevproject XML", e);
         }
         
         return null;
